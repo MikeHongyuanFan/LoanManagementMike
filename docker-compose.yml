@@ -1,0 +1,94 @@
+version: '3'
+
+services:
+  frontend:
+    image: ${DOCKER_USERNAME:-frappe}/frappe-lending:${TAG:-latest}
+    restart: always
+    ports:
+      - "${HTTP_PORT:-8080}:8080"
+    depends_on:
+      - backend
+      - db
+      - redis-cache
+      - redis-queue
+    environment:
+      - FRAPPE_PY=backend:8000
+      - FRAPPE_SOCKETIO=websocket:9000
+      - FRAPPE_WS=websocket:9000
+
+  backend:
+    image: ${DOCKER_USERNAME:-frappe}/frappe-lending:${TAG:-latest}
+    restart: always
+    command: ["bench", "start"]
+    depends_on:
+      - db
+      - redis-cache
+      - redis-queue
+    environment:
+      - MARIADB_HOST=db
+      - REDIS_CACHE=redis-cache:6379
+      - REDIS_QUEUE=redis-queue:6379
+
+  websocket:
+    image: ${DOCKER_USERNAME:-frappe}/frappe-lending:${TAG:-latest}
+    restart: always
+    command: ["node", "/home/frappe/frappe-bench/apps/frappe/socketio.js"]
+    depends_on:
+      - backend
+      - redis-cache
+      - redis-queue
+
+  scheduler:
+    image: ${DOCKER_USERNAME:-frappe}/frappe-lending:${TAG:-latest}
+    restart: always
+    command: ["bench", "schedule"]
+    depends_on:
+      - backend
+      - redis-cache
+      - redis-queue
+
+  queue-short:
+    image: ${DOCKER_USERNAME:-frappe}/frappe-lending:${TAG:-latest}
+    restart: always
+    command: ["bench", "worker", "--queue", "short"]
+    depends_on:
+      - backend
+      - redis-cache
+      - redis-queue
+
+  queue-long:
+    image: ${DOCKER_USERNAME:-frappe}/frappe-lending:${TAG:-latest}
+    restart: always
+    command: ["bench", "worker", "--queue", "long"]
+    depends_on:
+      - backend
+      - redis-cache
+      - redis-queue
+
+  db:
+    image: mariadb:10.6
+    restart: always
+    environment:
+      - MYSQL_ROOT_PASSWORD=${DB_ROOT_PASSWORD:-123}
+      - MYSQL_USER=${DB_USER:-frappe}
+      - MYSQL_PASSWORD=${DB_PASSWORD:-frappe}
+      - MYSQL_DATABASE=${DB_NAME:-frappe}
+    volumes:
+      - db-data:/var/lib/mysql
+
+  redis-cache:
+    image: redis:6.2-alpine
+    restart: always
+    volumes:
+      - redis-cache-data:/data
+
+  redis-queue:
+    image: redis:6.2-alpine
+    restart: always
+    volumes:
+      - redis-queue-data:/data
+
+volumes:
+  db-data:
+  redis-cache-data:
+  redis-queue-data:
