@@ -1,90 +1,82 @@
-[![Build Stable](https://github.com/frappe/frappe_docker/actions/workflows/build_stable.yml/badge.svg)](https://github.com/frappe/frappe_docker/actions/workflows/build_stable.yml)
-[![Build Develop](https://github.com/frappe/frappe_docker/actions/workflows/build_develop.yml/badge.svg)](https://github.com/frappe/frappe_docker/actions/workflows/build_develop.yml)
+# Loan Management System
 
-Everything about [Frappe](https://github.com/frappe/frappe) and [ERPNext](https://github.com/frappe/erpnext) in containers.
+This repository contains a Frappe-based Loan Management System built using Docker. It integrates the Frappe Framework, ERPNext, and the Lending application to provide a comprehensive solution for managing loans and lending operations.
 
-# Getting Started
+## Features
 
-To get started you need [Docker](https://docs.docker.com/get-docker/), [docker-compose](https://docs.docker.com/compose/), and [git](https://docs.github.com/en/get-started/getting-started-with-git/set-up-git) setup on your machine. For Docker basics and best practices refer to Docker's [documentation](http://docs.docker.com).
+- **Loan Application Processing**: Create and manage loan applications
+- **Loan Management**: Track loans throughout their lifecycle
+- **Repayment Scheduling**: Generate and manage repayment schedules
+- **Interest Calculation**: Automatic interest calculation based on various methods
+- **Loan Security Management**: Track securities against loans
+- **Loan Write-off Handling**: Process for writing off loans
+- **Reporting and Analytics**: Comprehensive reporting for loan portfolios
 
-Once completed, chose one of the following two sections for next steps.
+## Setup Instructions
 
-### Try in Play With Docker
+### Prerequisites
+- Docker
+- Docker Compose
+- Git
 
-To play in an already set up sandbox, in your browser, click the button below:
+### Installation
 
-<a href="https://labs.play-with-docker.com/?stack=https://raw.githubusercontent.com/frappe/frappe_docker/main/pwd.yml">
-  <img src="https://raw.githubusercontent.com/play-with-docker/stacks/master/assets/images/button.png" alt="Try in PWD"/>
-</a>
+1. Clone this repository:
+   ```
+   git clone https://github.com/MikeHongyuanFan/LoanManagementMike.git
+   cd LoanManagementMike
+   ```
 
-### Try on your Dev environment
+2. Start the Docker containers:
+   ```
+   docker compose -f pwd.yml up -d
+   ```
 
-First clone the repo:
+3. After a few minutes, access the application at:
+   ```
+   http://localhost:8080
+   ```
 
-```sh
-git clone https://github.com/frappe/frappe_docker
-cd frappe_docker
-```
+4. Login with the default credentials:
+   - Username: Administrator
+   - Password: admin
 
-Then run: `docker compose -f pwd.yml up -d`
+## Architecture
 
-### To run on ARM64 architecture follow this instructions
+This project uses a multi-container Docker setup with the following components:
 
-After cloning the repo run this command to build multi-architecture images specifically for ARM64.
+- **MariaDB**: Database server
+- **Redis**: Cache and queue server
+- **Frappe Backend**: Application server
+- **Nginx**: Web server
+- **Workers**: Background task processing
+- **Scheduler**: Scheduled tasks execution
 
-`docker buildx bake --no-cache --set "*.platform=linux/arm64"`
+## Development
 
-and then
+To make changes to the Lending application:
 
-- add `platform: linux/arm64` to all services in the `pwd.yml`
-- replace the current specified versions of erpnext image on `pwd.yml` with `:latest`
+1. Connect to the backend container:
+   ```
+   docker exec -it frappe_docker-backend-1 bash
+   ```
 
-Then run: `docker compose -f pwd.yml up -d`
+2. Navigate to the lending app directory:
+   ```
+   cd /home/frappe/frappe-bench/apps/lending
+   ```
 
-## Final steps
+3. Make your changes and restart the services:
+   ```
+   bench restart
+   ```
 
-Wait for 5 minutes for ERPNext site to be created or check `create-site` container logs before opening browser on port 8080. (username: `Administrator`, password: `admin`)
+## License
 
-If you ran in a Dev Docker environment, to view container logs: `docker compose -f pwd.yml logs -f create-site`. Don't worry about some of the initial error messages, some services take a while to become ready, and then they go away.
+This project is licensed under the MIT License - see the LICENSE file for details.
 
-# Documentation
+## Acknowledgements
 
-### [Frequently Asked Questions](https://github.com/frappe/frappe_docker/wiki/Frequently-Asked-Questions)
-
-### [Production](#production)
-
-- [List of containers](docs/list-of-containers.md)
-- [Single Compose Setup](docs/single-compose-setup.md)
-- [Environment Variables](docs/environment-variables.md)
-- [Single Server Example](docs/single-server-example.md)
-- [Setup Options](docs/setup-options.md)
-- [Site Operations](docs/site-operations.md)
-- [Backup and Push Cron Job](docs/backup-and-push-cronjob.md)
-- [Port Based Multi Tenancy](docs/port-based-multi-tenancy.md)
-- [Migrate from multi-image setup](docs/migrate-from-multi-image-setup.md)
-- [running on linux/mac](docs/setup_for_linux_mac.md)
-- [TLS for local deployment](docs/tls-for-local-deployment.md)
-
-### [Custom Images](#custom-images)
-
-- [Custom Apps](docs/custom-apps.md)
-- [Custom Apps with podman](docs/custom-apps-podman.md)
-- [Build Version 10 Images](docs/build-version-10-images.md)
-
-### [Development](#development)
-
-- [Development using containers](docs/development.md)
-- [Bench Console and VSCode Debugger](docs/bench-console-and-vscode-debugger.md)
-- [Connect to localhost services](docs/connect-to-localhost-services-from-containers-for-local-app-development.md)
-
-### [Troubleshoot](docs/troubleshoot.md)
-
-# Contributing
-
-If you want to contribute to this repo refer to [CONTRIBUTING.md](CONTRIBUTING.md)
-
-This repository is only for container related stuff. You also might want to contribute to:
-
-- [Frappe framework](https://github.com/frappe/frappe#contributing),
-- [ERPNext](https://github.com/frappe/erpnext#contributing),
-- [Frappe Bench](https://github.com/frappe/bench).
+- [Frappe Framework](https://frappeframework.com/)
+- [ERPNext](https://erpnext.com/)
+- [Frappe Lending](https://github.com/frappe/lending)
